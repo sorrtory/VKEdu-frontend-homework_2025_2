@@ -8,6 +8,13 @@ QUnit.module("Тестируем функцию polishNotationEvaluator", functi
         assert.equal(result, 7);
     });
 
+    QUnit.test("Правильно вычисляет простое выражения со String", function(assert) {
+        const input = new String("+ 3 4"); // 3 + 4
+        const result = polishNotationEvaluator(input);
+
+        assert.equal(result, 7);
+    });
+
     QUnit.test("Правильно вычисляет выражение с несколькими операциями", function(assert) {
         const input = "* + 2 3 4"; // (2 + 3) * 4
         const result = polishNotationEvaluator(input);
@@ -24,6 +31,11 @@ QUnit.module("Тестируем функцию polishNotationEvaluator", functi
 
     QUnit.test("Правильно вычисляет пустое выражение", function(assert) {
         const input = "";
+        assert.throws(() => polishNotationEvaluator(input), Error);
+    });
+
+    QUnit.test("Правильно вычисляет пустое выражение со String", function(assert) {
+        const input = new String("");
         assert.throws(() => polishNotationEvaluator(input), Error);
     });
 

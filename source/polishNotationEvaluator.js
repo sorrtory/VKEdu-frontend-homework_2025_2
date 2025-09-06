@@ -6,6 +6,16 @@
 'use strict';
 
 /**
+ * Custom error for division by zero
+ */
+class DivisionByZeroError extends Error {
+    constructor(message = 'Division by zero') {
+        super(message);
+        this.name = this.constructor.name;
+    }
+}
+
+/**
  * Evaluates a Polish notation expression.
  *
  * @param {string} str String to be evaluated.
@@ -13,13 +23,17 @@
  * @throws {Error} Throws error if the input is invalid or expression cannot be evaluated.
  */
 const polishNotationEvaluator = str => {
-    if (typeof str !== 'string' || !str){
-        throw new Error('Input must be a non-empty string');
+    // Validate input to be non-empty string
+    if (!(typeof str === 'string') && !(str instanceof String)) {
+        throw new TypeError('Input must be a string');
+    }
+    if (str.trim().length === 0) {
+        throw new TypeError('Input string must be non-empty');
     }
 
     // Split the expression into tokens, ignoring whitespace
     const stackResult = str.split(' ').reverse().reduce((stack, token) => {
-        // Ignore empty tokens
+        // Ignore empty tokens (multiple spaces of splitted string)
         if (token === '') {
             return stack;
         }
@@ -27,13 +41,13 @@ const polishNotationEvaluator = str => {
         // Iterate the expression in reverse order
         // On numeric tokens, push them on the stack
         // On operators, apply them to the last two elements of the stack
-        if (!isNaN(Number(token))) {
+        if (!Number.isNaN(Number(token))) {
             stack.push(Number(token));
         } else {
             const a = stack.pop();
             const b = stack.pop();
-            if (a === undefined || b === undefined) {
-                throw new Error("Not enough operands given");
+            if (!a || !b) {
+                throw new SyntaxError("Not enough operands given");
             }
 
             switch (token) {
@@ -49,13 +63,13 @@ const polishNotationEvaluator = str => {
                 case '/':
                     // Check for division by zero
                     if (b === 0) {
-                        throw new Error('Division by zero');
+                        throw new DivisionByZeroError();
                     }
                     stack.push(a / b);
                     break;
                 default:
                     // Unknown token
-                    throw new Error(`Unknown token: ${token}`);
+                    throw new SyntaxError(`Unknown token: ${token}`);
                 }
             }
             return stack;
@@ -64,14 +78,14 @@ const polishNotationEvaluator = str => {
 
     // Check for remaining operands
     if (stackResult.length !== 1) {
-        throw new Error('Too many values. Result cannot be calculated');
+        throw new SyntaxError('Too many values. Result cannot be calculated');
     }
 
     // Check for numeric result
     const numericResult = stackResult.pop();
 
     if (isNaN(numericResult)) {
-        throw new Error('Result is not a number');
+        throw new SyntaxError('Result is not a number');
     }
     return numericResult;
 };  
