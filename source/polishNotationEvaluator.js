@@ -9,12 +9,15 @@
  * Custom error for division by zero
  */
 class DivisionByZeroError extends Error {
+    /**
+     * Creates a new DivisionByZeroError.
+     * @param {string} [message='Division by zero'] - Error message.
+     */
     constructor(message = 'Division by zero') {
         super(message);
         this.name = this.constructor.name;
     }
 }
-
 /**
  * Evaluates a Polish notation expression.
  *
